@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DigiSim - Résultats de la Simulation</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- Inclure Plotly.js pour les graphiques interactifs -->
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Section de setup dupliquée pour rester cohérent, mais désactivée ou réutilisée pour une nouvelle simulation -->
+        <div class="campaign-setup">
+            <div class="app-header">
+                <div class="app-logo">D</div>
+                <div>
+                    <div class="app-title">DigiSim</div>
+                    <div class="app-subtitle">Powered by Python & Flask</div>
+                </div>
+            </div>
+
+            <h2>CAMPAIGN SETUP</h2>
+            <form action="/" method="get"> <!-- Lien vers la page d'accueil pour une nouvelle simulation -->
+                <label for="product">PRODUCT TYPE</label>
+                <select id="product" name="product" disabled>
+                    <option value="{{ request.form['product'] }}" selected>{{ request.form['product'] | title }}</option>
+                </select>
+
+                <label for="channel">AD CHANNEL</label>
+                <select id="channel" name="channel" disabled>
+                    <option value="{{ request.form['channel'] }}" selected>{{ request.form['channel'] | title }}</option>
+                </select>
+
+                <label for="budget">MONTHLY BUDGET (€)</label>
+                <input type="number" id="budget" name="budget" value="{{ request.form['budget'] }}" disabled>
+
+                <label for="duration">CAMPAIGN DURATION (Days)</label>
+                <input type="number" id="duration" name="duration" value="{{ request.form['duration'] }}" disabled>
+
+                <button type="submit">NEW SIMULATION</button>
+            </form>
+        </div>
+
+        <div class="simulation-results">
+            <h2>SIMULATION RESULTS</h2>
+
+            <div class="metrics-grid">
+                <div class="metric-card clicks">
+                    <div class="value">{{ "{:,.0f}".format(results.clicks) }}</div>
+                    <div class="label">CLICKS</div>
+                </div>
+                <div class="metric-card impressions">
+                    <div class="value">{{ "{:,.0f}".format(results.impressions) }}</div>
+                    <div class="label">IMPRESSIONS</div>
+                </div>
+                <div class="metric-card sales">
+                    <div class="value">{{ "{:,.0f}".format(results.sales) }}</div>
+                    <div class="label">SALES</div>
+                </div>
+                <div class="metric-card profit">
+                    <div class="value">{{ "{:,.0f}€".format(results.profit) }}</div>
+                    <div class="label">PROFIT</div>
+                </div>
+            </div>
+
+            <div class="charts-grid">
+                <div class="chart-card">
+                    <h3>PERFORMANCE OVER TIME</h3>
+                    <div id="performance_chart"></div>
+                </div>
+                <div class="chart-card">
+                    <h3>CHANNEL COMPARISON</h3>
+                    <div id="channel_comparison_chart"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Correction ici : Utilisation de |tojson et |safe
+        const chartsData = {{ results.charts_data | tojson | safe }};
+
+        // Graphique Performance Over Time
+        const performanceChartData = [
+            {
+                x: chartsData.performance_over_time.labels,
+                y: chartsData.performance_over_time.clicks,
+                mode: 'lines+markers',
+                name: 'Clicks',
+                line: { color: '#4CAF50' }
+            },
+            {
+                x: chartsData.performance_over_time.labels,
+                y: chartsData.performance_over_time.sales,
+                mode: 'lines+markers',
+                name: 'Sales',
+                line: { color: '#03A9F4' }
+            },
+            {
+                x: chartsData.performance_over_time.labels,
+                y: chartsData.performance_over_time.profit,
+                mode: 'lines+markers',
+                name: 'Profit',
+                line: { color: '#9C27B0' }
+            }
+        ];
+
+        const performanceLayout = {
+            plot_bgcolor: '#4a4a4a',
+            paper_bgcolor: '#4a4a4a',
+            font: {
+                color: '#e0e0e0'
+            },
+            xaxis: {
+                title: 'Day',
+                showgrid: false,
+                linecolor: '#555',
+                linewidth: 1,
+            },
+            yaxis: {
+                title: 'Value',
+                gridcolor: '#555',
+                linecolor: '#555',
+                linewidth: 1,
+            },
+            legend: {
+                x: 0, y: 1.1,
+                bgcolor: '#4a4a4a',
+                bordercolor: '#555',
+                borderwidth: 1
+            },
+            margin: { t: 40, b: 40, l: 50, r: 20 } // Ajuster les marges
+        };
+
+        Plotly.newPlot('performance_chart', performanceChartData, performanceLayout, {responsive: true});
+
+        // Graphique Channel Comparison
+        const channelChartData = [
+            {
+                x: chartsData.channel_comparison.channels,
+                y: chartsData.channel_comparison.sales,
+                type: 'bar',
+                marker: {
+                    color: ['#4CAF50', '#FFC107', '#03A9F4', '#9C27B0'] // Couleurs différentes pour les barres
+                }
+            }
+        ];
+
+        const channelLayout = {
+            plot_bgcolor: '#4a4a4a',
+            paper_bgcolor: '#4a4a4a',
+            font: {
+                color: '#e0e0e0'
+            },
+            xaxis: {
+                title: 'Channel',
+                showgrid: false,
+                linecolor: '#555',
+                linewidth: 1,
+            },
+            yaxis: {
+                title: 'Sales',
+                gridcolor: '#555',
+                linecolor: '#555',
+                linewidth: 1,
+            },
+            margin: { t: 40, b: 40, l: 50, r: 20 }
+        };
+
+        Plotly.newPlot('channel_comparison_chart', channelChartData, channelLayout, {responsive: true});
+    </script>
+</body>
+</html>

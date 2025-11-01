@@ -1,0 +1,195 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+
+body {
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #2c2c2c; /* Couleur de fond foncée */
+    color: #e0e0e0; /* Texte clair */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+.dashboard-container {
+    background-color: #383838; /* Couleur du conteneur principal */
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+    display: flex;
+    width: 90%;
+    max-width: 1200px;
+    min-height: 700px;
+    overflow: hidden;
+}
+
+.campaign-setup {
+    background-color: #2a2a2a; /* Fond de la section de configuration */
+    padding: 30px;
+    width: 300px;
+    border-right: 1px solid #444;
+    display: flex;
+    flex-direction: column;
+}
+
+.campaign-setup h2 {
+    color: #f0f0f0;
+    margin-top: 0;
+    margin-bottom: 30px;
+    font-size: 1.5em;
+    border-bottom: 1px solid #444;
+    padding-bottom: 15px;
+}
+
+.campaign-setup label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #c0c0c0;
+    font-size: 0.9em;
+}
+
+.campaign-setup select,
+.campaign-setup input[type="number"] {
+    width: calc(100% - 20px);
+    padding: 10px;
+    margin-bottom: 20px;
+    border: 1px solid #555;
+    background-color: #4a4a4a;
+    color: #e0e0e0;
+    border-radius: 6px;
+    font-size: 0.95em;
+    -webkit-appearance: none; /* Supprime le style par défaut sur Webkit */
+    -moz-appearance: none;    /* Supprime le style par défaut sur Mozilla */
+    appearance: none;         /* Supprime le style par défaut */
+}
+.campaign-setup select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23e0e0e0'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 20px;
+}
+
+
+.campaign-setup button {
+    background-color: #007bff; /* Bleu vif */
+    color: white;
+    padding: 18px 25px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 1.1em;
+    font-weight: 700;
+    margin-top: auto; /* Pousse le bouton vers le bas */
+    transition: background-color 0.2s ease;
+}
+
+.campaign-setup button:hover {
+    background-color: #0056b3;
+}
+
+.simulation-results {
+    flex-grow: 1;
+    padding: 30px;
+}
+
+.simulation-results h2 {
+    color: #f0f0f0;
+    margin-top: 0;
+    margin-bottom: 30px;
+    font-size: 1.5em;
+}
+
+.metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-bottom: 40px;
+}
+
+.metric-card {
+    background-color: #4a4a4a;
+    border-radius: 8px;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.metric-card.clicks { background-color: #4CAF50; } /* Vert */
+.metric-card.impressions { background-color: #FFC107; } /* Ambre */
+.metric-card.sales { background-color: #03A9F4; } /* Bleu clair */
+.metric-card.profit { background-color: #9C27B0; } /* Violet */
+
+
+.metric-card .value {
+    font-size: 2.2em;
+    font-weight: 700;
+    margin-bottom: 5px;
+    color: #fff;
+}
+
+.metric-card .label {
+    font-size: 0.9em;
+    color: #e0e0e0;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.charts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 30px;
+    margin-top: 30px;
+}
+
+.chart-card {
+    background-color: #4a4a4a;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.chart-card h3 {
+    color: #f0f0f0;
+    margin-top: 0;
+    margin-bottom: 20px;
+    font-size: 1.2em;
+    text-align: center;
+}
+
+/* Styles pour les logos ou entêtes */
+.app-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.app-logo {
+    width: 40px; /* Taille du logo */
+    height: 40px;
+    background-color: #007bff; /* Couleur du logo */
+    border-radius: 8px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.5em;
+    font-weight: 700;
+    color: white;
+    margin-right: 15px;
+}
+
+.app-title {
+    font-size: 1.8em;
+    font-weight: 700;
+    color: #f0f0f0;
+}
+
+.app-subtitle {
+    font-size: 0.8em;
+    color: #a0a0a0;
+    margin-top: 5px;
+}

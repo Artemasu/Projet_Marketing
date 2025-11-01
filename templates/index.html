@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DigiSim - Simulateur de Campagne Digitale</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <!-- Police Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="dashboard-container">
+        <div class="campaign-setup">
+            <div class="app-header">
+                <div class="app-logo">D</div>
+                <div>
+                    <div class="app-title">DigiSim</div>
+                    <div class="app-subtitle">Powered by Python & Flask</div>
+                </div>
+            </div>
+
+            <h2>CAMPAIGN SETUP</h2>
+            <form action="/simulate" method="post">
+                <label for="product">PRODUCT TYPE</label>
+                <select id="product" name="product">
+                    <option value="e-commerce">E-commerce Product</option>
+                    <option value="saas">SaaS Service</option>
+                    <option value="app">Mobile App</option>
+                    <option value="local">Local Business</option>
+                </select>
+
+                <label for="channel">AD CHANNEL</label>
+                <select id="channel" name="channel">
+                    <option value="facebook">Facebook</option>
+                    <option value="instagram">Instagram</option>
+                    <option value="google">Google</option>
+                    <option value="tiktok">TikTok</option>
+                </select>
+
+                <label for="budget">MONTHLY BUDGET (€)</label>
+                <input type="number" id="budget" name="budget" min="100" value="5000" placeholder="e.g., 5000">
+
+                <label for="duration">CAMPAIGN DURATION (Days)</label>
+                <input type="number" id="duration" name="duration" min="7" value="30" placeholder="e.g., 30">
+
+                <button type="submit">RUN SIMULATION</button>
+            </form>
+        </div>
+
+        <div class="simulation-results">
+            <!-- Cette section sera remplie par le POST vers /simulate -->
+            <h2>SIMULATION RESULTS</h2>
+            <p>Veuillez lancer une simulation depuis le panneau de gauche.</p>
+        </div>
+    </div>
+</body>
+</html>
