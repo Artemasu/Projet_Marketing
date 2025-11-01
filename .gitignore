@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Flask
+instance/
+
+# IDEs
+.vscode/        # Si vous utilisez des configurations spécifiques à VS Code
+.idea/          # Si vous utilisez PyCharm
+
+# Logs and databases
+*.log
+*.sqlite
+*.db
