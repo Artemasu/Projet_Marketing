@@ -22,6 +22,13 @@
             </div>
 
             <h2>CAMPAIGN SETUP</h2>
+            <!-- NOUVEAU : Ajout de la navigation -->
+            <nav class="main-nav">
+                <a href="/" class="nav-button">Nouvelle Simulation</a>
+                <a href="/history" class="nav-button">Historique</a>
+            </nav>
+            <!-- FIN NOUVEAU -->
+
             <form action="/" method="get"> <!-- Lien vers la page d'accueil pour une nouvelle simulation -->
                 <label for="product">PRODUCT TYPE</label>
                 <select id="product" name="product" disabled>
@@ -79,7 +86,6 @@
     </div>
 
     <script>
-        // Correction ici : Utilisation de |tojson et |safe
         const chartsData = {{ results.charts_data | tojson | safe }};
 
         // Graphique Performance Over Time
@@ -131,7 +137,7 @@
                 bordercolor: '#555',
                 borderwidth: 1
             },
-            margin: { t: 40, b: 40, l: 50, r: 20 } // Ajuster les marges
+            margin: { t: 40, b: 40, l: 50, r: 20 }
         };
 
         Plotly.newPlot('performance_chart', performanceChartData, performanceLayout, {responsive: true});
@@ -143,7 +149,7 @@
                 y: chartsData.channel_comparison.sales,
                 type: 'bar',
                 marker: {
-                    color: ['#4CAF50', '#FFC107', '#03A9F4', '#9C27B0'] // Couleurs différentes pour les barres
+                    color: ['#4CAF50', '#FFC107', '#03A9F4', '#9C27B0']
                 }
             }
         ];

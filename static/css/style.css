@@ -193,3 +193,77 @@ body {
     color: #a0a0a0;
     margin-top: 5px;
 }
+
+/* NOUVEAU : Styles pour la navigation et l'historique */
+.main-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 30px;
+}
+
+.nav-button {
+    background-color: #555;
+    color: white;
+    padding: 12px 15px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: background-color 0.2s ease;
+    text-align: center;
+}
+
+.nav-button:hover {
+    background-color: #007bff;
+}
+
+.nav-button.active {
+    background-color: #007bff;
+}
+
+/* Styles pour la grille d'historique */
+.history-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    margin-top: 30px;
+}
+
+.history-card {
+    background-color: #4a4a4a;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+}
+
+.history-card .card-header {
+    background-color: #555;
+    padding: 15px;
+    color: #f0f0f0;
+    border-bottom: 1px solid #666;
+}
+
+.history-card .card-header h3 {
+    margin: 0;
+    font-size: 1.1em;
+}
+
+.history-card .card-body {
+    padding: 15px;
+}
+
+.history-card .card-body p {
+    margin: 5px 0;
+    font-size: 0.95em;
+    color: #c0c0c0;
+}
+
+.history-card .card-body strong {
+    color: #e0e0e0;
+}
+
+.history-card .card-body hr {
+    border: none;
+    border-top: 1px solid #666;
+    margin: 15px 0;
+}

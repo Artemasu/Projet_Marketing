@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DigiSim - Historique des Simulations</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="dashboard-container">
+        <div class="campaign-setup">
+            <div class="app-header">
+                <div class="app-logo">D</div>
+                <div>
+                    <div class="app-title">DigiSim</div>
+                    <div class="app-subtitle">Powered by Python & Flask</div>
+                </div>
+            </div>
+            <h2>NAVIGATION</h2>
+            <nav class="main-nav">
+                <a href="/" class="nav-button">Nouvelle Simulation</a>
+                <a href="/history" class="nav-button active">Historique</a>
+            </nav>
+        </div>
+
+        <div class="simulation-results">
+            <h2>HISTORIQUE DES SIMULATIONS</h2>
+
+            {% if simulations %}
+                <div class="history-grid">
+                    {% for sim in simulations %}
+                    <div class="history-card">
+                        <div class="card-header">
+                            <h3>Simulation #{{ sim.id }} - {{ sim.timestamp }}</h3>
+                        </div>
+                        <div class="card-body">
+                            <p><strong>Produit:</strong> {{ sim.product_type | title }}</p>
+                            <p><strong>Canal:</strong> {{ sim.channel | title }}</p>
+                            <p><strong>Budget:</strong> {{ "{:,.0f}€".format(sim.budget) }}</p>
+                            <p><strong>Durée:</strong> {{ sim.duration }} jours</p>
+                            <hr>
+                            <p><strong>Clics:</strong> {{ "{:,.0f}".format(sim.clicks) }}</p>
+                            <p><strong>Impressions:</strong> {{ "{:,.0f}".format(sim.impressions) }}</p>
+                            <p><strong>Ventes:</strong> {{ "{:,.0f}".format(sim.sales) }}</p>
+                            <p><strong>Profit:</strong> {{ "{:,.0f}€".format(sim.profit) }}</p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p>Aucune simulation n'a été enregistrée pour le moment.</p>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>
