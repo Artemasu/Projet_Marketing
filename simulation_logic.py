@@ -1,105 +1,75 @@
-import random
+import pandas as pd
+import numpy as np
 
 def run_campaign_simulation(product_type, channel, budget, duration):
-    """
-    Simule une campagne de marketing digital avec des facteurs plus réalistes
-    basés sur le type de produit et le canal.
-    """
+    try:
+        market_df = pd.read_csv('market_insights.csv')
+        stats = market_df[market_df['channel'] == 'ad'].iloc[0]
+        cpc_reel = stats['avg_cpc']
+        conv_rate_reel = stats['avg_conv_rate']
+    except:
+        cpc_reel, conv_rate_reel = 0.8, 0.02
 
-    # Coefficients de base (peuvent être ajustés avec des données réelles/synthétiques)
-    base_cpc = { # Coût par clic moyen (€)
-        'facebook': 0.8,
-        'instagram': 0.9,
-        'google': 1.5,
-        'tiktok': 0.6
-    }
-    base_conversion_rate = { # Taux de conversion moyen (en %)
-        'e-commerce': 0.02, # 2%
-        'saas': 0.01,       # 1%
-        'app': 0.03,        # 3%
-        'local': 0.025      # 2.5%
-    }
-    base_aov = { # Average Order Value / Valeur moyenne par vente (€)
-        'e-commerce': 60,
-        'saas': 120,
-        'app': 10, # Les revenus d'une app peuvent être plus faibles par vente unitaire
-        'local': 80
-    }
+    aov_map = {'e-commerce': 60, 'saas': 150, 'app': 15, 'local': 100}
+    panier_moyen = aov_map.get(product_type.lower(), 50)
 
-    # Ajustement des coefficients par canal et type de produit (exemple)
-    cpc_multiplier = 1.0
-    conversion_multiplier = 1.0
-    aov_multiplier = 1.0
+    daily_budget = budget / duration
+    performance_labels = []
+    performance_clicks = []
+    performance_sales = []
+    performance_profit = []
 
-    # Impact du canal sur le CPC (exemple : Google est plus cher)
-    cpc = base_cpc.get(channel, 1.0) * cpc_multiplier
+    cum_clicks = 0
+    cum_sales = 0
+    cum_profit = 0
 
-    # Impact du type de produit sur le taux de conversion et la valeur moyenne
-    conversion_rate = base_conversion_rate.get(product_type, 0.015) * conversion_multiplier
-    aov = base_aov.get(product_type, 75) * aov_multiplier
-
-    # Simulation journalière pour un meilleur suivi de la performance
-    daily_data = []
-    total_clicks = 0
-    total_impressions = 0
-    total_sales = 0
-    total_profit = 0
-
-    # Simulation sur la durée spécifiée
     for day in range(1, duration + 1):
-        # Budget quotidien (simplifié, pourrait être réparti différemment)
-        daily_budget = budget / 30 # Convertir budget mensuel en quotidien
+        day_clicks = np.random.poisson(daily_budget / cpc_reel)
         
-        # Le budget quotidien influence les clics
-        daily_clicks = (daily_budget / cpc) * (1 + random.uniform(-0.1, 0.1)) # Ajout d'une petite variabilité
-        daily_clicks = max(1, daily_clicks) # Au moins 1 clic
+        day_sales = np.random.binomial(day_clicks, conv_rate_reel)
         
-        daily_impressions = daily_clicks * random.uniform(8, 12) # Ratio impressions/clics
-        
-        daily_sales = daily_clicks * conversion_rate * (1 + random.uniform(-0.15, 0.15))
-        daily_sales = round(daily_sales) # Nombre entier de ventes
-        
-        daily_revenue = daily_sales * aov
-        daily_cost = daily_budget # Pour simplifier, le coût est le budget dépensé
-        daily_profit = daily_revenue - daily_cost
+        day_profit = (day_sales * panier_moyen) - daily_budget
 
-        total_clicks += daily_clicks
-        total_impressions += daily_impressions
-        total_sales += daily_sales
-        total_profit += daily_profit
+        cum_clicks += day_clicks
+        cum_sales += day_sales
+        cum_profit += day_profit
 
-        daily_data.append({
-            'day': day,
-            'clicks': total_clicks, # Cumulatif
-            'impressions': total_impressions, # Cumulatif
-            'sales': total_sales, # Cumulatif
-            'profit': total_profit # Cumulatif
-        })
+        performance_labels.append(f"Jour {day}")
+        performance_clicks.append(int(cum_clicks))
+        performance_sales.append(int(cum_sales))
+        performance_profit.append(int(cum_profit))
 
-    # Données pour les graphiques "Performance Over Time"
-    performance_labels = [f"Day {d['day']}" for d in daily_data]
-    performance_clicks = [d['clicks'] for d in daily_data]
-    performance_sales = [d['sales'] for d in daily_data]
-    performance_profit = [d['profit'] for d in daily_data]
+    final_roi = (cum_profit / budget) * 100 if budget > 0 else 0
 
-    # Données pour le graphique "Channel Comparison" (fixe pour l'exemple, mais pourrait être dynamique)
-    # Pour le moment, nous allons laisser la logique de comparaison des canaux dans marketing.py
-    # ou nous pourrions l'intégrer ici plus tard avec des calculs distincts pour chaque canal.
+    best_roi = -float('inf')
+    best_budget, best_days = 0, 0
+    for test_budget in [1000, 3000, 5000, 10000]:
+        for test_days in [7, 14, 30]:
+            t_clicks = test_budget / cpc_reel
+            t_sales = t_clicks * conv_rate_reel
+            t_profit = (t_sales * panier_moyen) - test_budget
+            t_roi = (t_profit / test_budget) * 100
+            if t_roi > best_roi:
+                best_roi, best_budget, best_days = t_roi, test_budget, test_days
 
-    results = {
-        'clicks': total_clicks,
-        'impressions': total_impressions,
-        'sales': total_sales,
-        'profit': total_profit,
+    return {
+        'clicks': int(cum_clicks),
+        'impressions': int(cum_clicks * 12),
+        'sales': int(cum_sales),
+        'profit': float(cum_profit),
+        'roi': round(final_roi, 2),
+        'panier_moyen': panier_moyen,
+        'best_approach': {
+            'budget': best_budget,
+            'days': best_days,
+            'expected_roi': round(best_roi, 2)
+        },
         'charts_data': {
             'performance_over_time': {
                 'labels': performance_labels,
                 'clicks': performance_clicks,
                 'sales': performance_sales,
-                'profit': performance_profit,
-            },
-            # 'channel_comparison' sera géré dans marketing.py pour le moment
+                'profit': performance_profit
+            }
         }
     }
-    
-    return results

@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DigiSim - Simulateur de Campagne Digitale</title>
+    <title>DigiSim - Digital Campaign Simulator</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <!-- Police Google Fonts Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
@@ -15,15 +14,14 @@
                 <div class="app-logo">D</div>
                 <div>
                     <div class="app-title">DigiSim</div>
-                    <div class="app-subtitle">Powered by Python & Flask</div>
+                    <div class="app-subtitle">Marketing</div>
                 </div>
             </div>
 
             <h2>CAMPAIGN SETUP</h2>
-            <!-- NOUVEAU : Ajout de la navigation -->
             <nav class="main-nav">
-                <a href="/" class="nav-button active">Nouvelle Simulation</a>
-                <a href="/history" class="nav-button">Historique</a>
+                <a href="/" class="nav-button active">New Simulation</a>
+                <a href="/history" class="nav-button">History</a>
             </nav>
             <!-- FIN NOUVEAU -->
 
@@ -55,9 +53,8 @@
         </div>
 
         <div class="simulation-results">
-            <!-- Cette section sera remplie par le POST vers /simulate -->
             <h2>SIMULATION RESULTS</h2>
-            <p>Veuillez lancer une simulation depuis le panneau de gauche.</p>
+            <p>Please start a simulation from the left panel.</p>
         </div>
     </div>
 </body>

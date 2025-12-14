@@ -1,129 +1,107 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect, url_for
 import json
-from simulation_logic import run_campaign_simulation # <-- NOUVEAU
-import sqlite3 # <-- NOUVEAU
+import sqlite3
+import os
+import pandas as pd
+from simulation_logic import run_campaign_simulation 
 
-# Le nom de l'application Flask correspond au nom du fichier
 marketing = Flask(__name__)
-DATABASE = 'campaign_results.db' # <-- NOUVEAU : Nom de la base de données
+DATABASE = 'campaign_results.db'
 
-# NOUVEAU : Fonction pour initialiser la base de données
 def init_db():
     with sqlite3.connect(DATABASE) as conn:
         cursor = conn.cursor()
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS simulations (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                product_type TEXT NOT NULL,
-                channel TEXT NOT NULL,
-                budget REAL NOT NULL,
-                duration INTEGER NOT NULL,
-                clicks REAL NOT NULL,
-                impressions REAL NOT NULL,
-                sales REAL NOT NULL,
-                profit REAL NOT NULL,
+                product_type TEXT,
+                channel TEXT,
+                budget REAL,
+                duration INTEGER,
+                clicks INTEGER,
+                impressions INTEGER,
+                sales INTEGER,
+                profit REAL,
                 timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
             )
         ''')
+        
+        cursor.execute("PRAGMA table_info(simulations)")
+        columns = [column[1] for column in cursor.fetchall()]
+        if 'roi' not in columns:
+            cursor.execute('ALTER TABLE simulations ADD COLUMN roi REAL DEFAULT 0')
+        if 'panier_moyen' not in columns:
+            cursor.execute('ALTER TABLE simulations ADD COLUMN panier_moyen REAL DEFAULT 0')
         conn.commit()
 
-# NOUVEAU : Appel à l'initialisation de la DB au démarrage de l'app
-with marketing.app_context():
-    init_db()
+init_db()
 
 @marketing.route('/')
 def index():
-    # Cette route affiche le formulaire de configuration de la campagne
     return render_template('index.html')
 
 @marketing.route('/simulate', methods=['POST'])
 def simulate():
-    # Récupérer les données du formulaire
-    product = request.form['product']
-    channel = request.form['channel']
-    budget = float(request.form['budget'])
-    duration = int(request.form['duration'])
+    product = request.form.get('product', 'e-commerce')
+    channel = request.form.get('channel', 'facebook')
+    budget = float(request.form.get('budget', 5000))
+    duration = int(request.form.get('duration', 30))
 
-    # --- UTILISATION DE LA NOUVELLE LOGIQUE DE SIMULATION ---
-    simulation_results = run_campaign_simulation(product, channel, budget, duration)
-    # --- FIN DE LA NOUVELLE LOGIQUE DE SIMULATION ---
-
-    # Récupérer les métriques principales de la simulation
-    clicks = simulation_results['clicks']
-    impressions = simulation_results['impressions']
-    sales = simulation_results['sales']
-    profit = simulation_results['profit']
-
-    # Données pour le graphique "Performance Over Time"
-    performance_labels = simulation_results['charts_data']['performance_over_time']['labels']
-    performance_clicks = simulation_results['charts_data']['performance_over_time']['clicks']
-    performance_sales = simulation_results['charts_data']['performance_over_time']['sales']
-    performance_profit = simulation_results['charts_data']['performance_over_time']['profit']
-
-    # Données pour le graphique "Channel Comparison" (peut rester ici pour l'instant)
-    # NOTE: Pour une comparaison plus réaliste, cette partie devrait aussi être dans la logique
-    # de simulation si vous voulez simuler tous les canaux pour une comparaison directe.
-    channel_sales = {
-        'Facebook': int(sales * 0.8 if channel == 'facebook' else sales * 0.2),
-        'Instagram': int(sales * 0.7 if channel == 'instagram' else sales * 0.25),
-        'Google': int(sales * 1.2 if channel == 'google' else sales * 0.3),
-        'TikTok': int(sales * 0.9 if channel == 'tiktok' else sales * 0.15),
-    }
-
-    results = {
-        'clicks': clicks,
-        'impressions': impressions,
-        'sales': sales,
-        'profit': profit,
-        'charts_data': {
-            'performance_over_time': {
-                'labels': performance_labels,
-                'clicks': performance_clicks,
-                'sales': performance_sales,
-                'profit': performance_profit,
-            },
-            'channel_comparison': {
-                'channels': list(channel_sales.keys()),
-                'sales': list(channel_sales.values())
-            }
-        }
-    }
+    sim_results = run_campaign_simulation(product, channel, budget, duration)
     
-    # Sérialiser les données des graphiques en JSON pour les passer au frontend
-    results['charts_data_json'] = json.dumps(results['charts_data'])
+    try:
+        df_insights = pd.read_csv('market_insights.csv')
+        channel_comparison = {
+            'channels': df_insights['channel'].tolist(),
+            'sales': [round(val * 100, 2) for val in df_insights['avg_conv_rate'].tolist()]
+        }
+    except:
+        channel_comparison = {'channels': ['ad', 'psa'], 'sales': [2.55, 1.79]}
+    
+    sim_results['charts_data']['channel_comparison'] = channel_comparison
 
-    # NOUVEAU : Sauvegarder les résultats dans la base de données
     try:
         with sqlite3.connect(DATABASE) as conn:
             cursor = conn.cursor()
             cursor.execute('''
-                INSERT INTO simulations (product_type, channel, budget, duration, clicks, impressions, sales, profit)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-            ''', (product, channel, budget, duration, clicks, impressions, sales, profit))
+                INSERT INTO simulations (product_type, channel, budget, duration, clicks, impressions, sales, profit, roi, panier_moyen)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ''', (product, channel, budget, duration, sim_results['clicks'], sim_results['impressions'], 
+                  sim_results['sales'], sim_results['profit'], sim_results['roi'], sim_results['panier_moyen']))
             conn.commit()
     except sqlite3.Error as e:
-        print(f"Erreur lors de l'insertion dans la base de données : {e}")
+        print(f"Erreur DB insertion: {e}")
 
+    results = {
+        **sim_results,
+        'charts_data_json': json.dumps(sim_results['charts_data'])
+    }
 
-    # Rendre le template des résultats avec les données de la simulation
     return render_template('results.html', results=results, request=request)
 
-# NOUVEAU : Route pour afficher l'historique des simulations
 @marketing.route('/history')
 def history():
     simulations = []
     try:
         with sqlite3.connect(DATABASE) as conn:
-            conn.row_factory = sqlite3.Row # Permet d'accéder aux colonnes par leur nom
+            conn.row_factory = sqlite3.Row
             cursor = conn.cursor()
             cursor.execute('SELECT * FROM simulations ORDER BY timestamp DESC')
             simulations = cursor.fetchall()
     except sqlite3.Error as e:
-        print(f"Erreur lors de la récupération de l'historique : {e}")
-    
+        print(f"Erreur historique: {e}")
     return render_template('history.html', simulations=simulations)
 
+@marketing.route('/clear_history', methods=['POST'])
+def clear_history():
+    try:
+        with sqlite3.connect(DATABASE) as conn:
+            cursor = conn.cursor()
+            cursor.execute('DELETE FROM simulations')
+            conn.commit()
+    except sqlite3.Error as e:
+        print(f"Erreur suppression: {e}")
+    return redirect(url_for('history'))
 
 if __name__ == '__main__':
-    # Lancer l'application en mode debug (rechargement automatique)
     marketing.run(debug=True)

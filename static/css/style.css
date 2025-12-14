@@ -4,8 +4,8 @@ body {
     font-family: 'Inter', sans-serif;
     margin: 0;
     padding: 0;
-    background-color: #2c2c2c; /* Couleur de fond foncée */
-    color: #e0e0e0; /* Texte clair */
+    background-color: #2c2c2c;
+    color: #e0e0e0;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -13,7 +13,7 @@ body {
 }
 
 .dashboard-container {
-    background-color: #383838; /* Couleur du conteneur principal */
+    background-color: #383838;
     border-radius: 12px;
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
     display: flex;
@@ -24,7 +24,7 @@ body {
 }
 
 .campaign-setup {
-    background-color: #2a2a2a; /* Fond de la section de configuration */
+    background-color: #2a2a2a;
     padding: 30px;
     width: 300px;
     border-right: 1px solid #444;
@@ -59,9 +59,9 @@ body {
     color: #e0e0e0;
     border-radius: 6px;
     font-size: 0.95em;
-    -webkit-appearance: none; /* Supprime le style par défaut sur Webkit */
-    -moz-appearance: none;    /* Supprime le style par défaut sur Mozilla */
-    appearance: none;         /* Supprime le style par défaut */
+    -webkit-appearance: none; 
+    -moz-appearance: none;    
+    appearance: none; 
 }
 .campaign-setup select {
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23e0e0e0'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
@@ -72,7 +72,7 @@ body {
 
 
 .campaign-setup button {
-    background-color: #007bff; /* Bleu vif */
+    background-color: #007bff; 
     color: white;
     padding: 18px 25px;
     border: none;
@@ -80,7 +80,7 @@ body {
     cursor: pointer;
     font-size: 1.1em;
     font-weight: 700;
-    margin-top: auto; /* Pousse le bouton vers le bas */
+    margin-top: auto; 
     transition: background-color 0.2s ease;
 }
 
@@ -119,10 +119,10 @@ body {
     align-items: center;
 }
 
-.metric-card.clicks { background-color: #4CAF50; } /* Vert */
-.metric-card.impressions { background-color: #FFC107; } /* Ambre */
-.metric-card.sales { background-color: #03A9F4; } /* Bleu clair */
-.metric-card.profit { background-color: #9C27B0; } /* Violet */
+.metric-card.clicks { background-color: #4CAF50; } 
+.metric-card.impressions { background-color: #FFC107; } 
+.metric-card.sales { background-color: #03A9F4; } 
+.metric-card.profit { background-color: #9C27B0; }
 
 
 .metric-card .value {
@@ -161,7 +161,6 @@ body {
     text-align: center;
 }
 
-/* Styles pour les logos ou entêtes */
 .app-header {
     display: flex;
     align-items: center;
@@ -194,7 +193,6 @@ body {
     margin-top: 5px;
 }
 
-/* NOUVEAU : Styles pour la navigation et l'historique */
 .main-nav {
     display: flex;
     flex-direction: column;
@@ -221,7 +219,6 @@ body {
     background-color: #007bff;
 }
 
-/* Styles pour la grille d'historique */
 .history-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
