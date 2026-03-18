@@ -2,55 +2,64 @@ import pandas as pd
 import numpy as np
 
 def run_campaign_simulation(product_type, channel, budget, duration):
+    # 1. RÉCUPÉRATION DES DONNÉES DE MARCHÉ
     try:
         market_df = pd.read_csv('market_insights.csv')
         stats = market_df[market_df['channel'] == 'ad'].iloc[0]
-        cpc_reel = stats['avg_cpc']
-        conv_rate_reel = stats['avg_conv_rate']
+        base_cpc = stats['avg_cpc']
+        base_conv_rate = stats['avg_conv_rate']
     except:
-        cpc_reel, conv_rate_reel = 0.8, 0.02
+        base_cpc, base_conv_rate = 0.8, 0.02
 
+    # 2. PANIER MOYEN SELON LE PRODUIT
     aov_map = {'e-commerce': 60, 'saas': 150, 'app': 15, 'local': 100}
     panier_moyen = aov_map.get(product_type.lower(), 50)
 
+    # 3. SIMULATION RÉELLE
     daily_budget = budget / duration
-    performance_labels = []
-    performance_clicks = []
-    performance_sales = []
-    performance_profit = []
-
-    cum_clicks = 0
-    cum_sales = 0
-    cum_profit = 0
+    performance_labels, performance_clicks, performance_sales, performance_profit = [], [], [], []
+    cum_clicks, cum_sales, cum_profit = 0, 0, 0
 
     for day in range(1, duration + 1):
-        day_clicks = np.random.poisson(daily_budget / cpc_reel)
-        
-        day_sales = np.random.binomial(day_clicks, conv_rate_reel)
-        
+        daily_cpc = base_cpc * np.random.uniform(0.95, 1.05)
+        day_clicks = np.random.poisson(daily_budget / daily_cpc)
+        day_sales = np.random.binomial(day_clicks, base_conv_rate)
         day_profit = (day_sales * panier_moyen) - daily_budget
-
+        
         cum_clicks += day_clicks
         cum_sales += day_sales
         cum_profit += day_profit
-
-        performance_labels.append(f"Jour {day}")
+        
+        performance_labels.append(f"Day {day}")
         performance_clicks.append(int(cum_clicks))
         performance_sales.append(int(cum_sales))
         performance_profit.append(int(cum_profit))
 
     final_roi = (cum_profit / budget) * 100 if budget > 0 else 0
 
-    best_roi = -float('inf')
-    best_budget, best_days = 0, 0
-    for test_budget in [1000, 3000, 5000, 10000]:
-        for test_days in [7, 14, 30]:
-            t_clicks = test_budget / cpc_reel
-            t_sales = t_clicks * conv_rate_reel
-            t_profit = (t_sales * panier_moyen) - test_budget
-            t_roi = (t_profit / test_budget) * 100
-            if t_roi > best_roi:
-                best_roi, best_budget, best_days = t_roi, test_budget, test_days
+    # 4. ALGORITHME DE RECOMMANDATION (CORRIGÉ POUR ÉVITER LE TYPEERROR)
+    best_profit = -float('inf')
+    rec_budget, rec_days = budget, duration
+
+    # On s'assure que les bornes de range sont des entiers avec int()
+    limit_duration = int(duration)
+    limit_budget = int(budget)
+
+    for test_d in range(7, limit_duration + 1):
+        # On teste par paliers de 50€, en forçant l'entier pour range()
+        start_b = int(min(100, limit_budget))
+        for test_b in range(start_b, limit_budget + 1, 50):
+            
+            t_clicks = test_b / base_cpc
+            t_sales = t_clicks * base_conv_rate
+            t_profit = (t_sales * panier_moyen) - test_b
+            
+            if t_profit > best_profit:
+                best_profit = t_profit
+                rec_budget = test_b
+                rec_days = test_d
+
+    rec_roi = (best_profit / rec_budget * 100) if rec_budget > 0 else 0
 
     return {
         'clicks': int(cum_clicks),
@@ -60,9 +69,9 @@ def run_campaign_simulation(product_type, channel, budget, duration):
         'roi': round(final_roi, 2),
         'panier_moyen': panier_moyen,
         'best_approach': {
-            'budget': best_budget,
-            'days': best_days,
-            'expected_roi': round(best_roi, 2)
+            'budget': int(rec_budget),
+            'days': int(rec_days),
+            'expected_roi': round(rec_roi, 2)
         },
         'charts_data': {
             'performance_over_time': {

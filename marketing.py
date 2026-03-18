@@ -3,7 +3,7 @@ import json
 import sqlite3
 import os
 import pandas as pd
-from simulation_logic import run_campaign_simulation 
+from simulation_logic import run_campaign_simulation
 
 marketing = Flask(__name__)
 DATABASE = 'campaign_results.db'
